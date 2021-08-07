@@ -1,0 +1,94 @@
+                                                                                PLSQL_ASSESSMENT
+1)
+Create table myemp (Eno number(4) PRIMARY KEY, Ename varchar2(30) NOT NULL,Deptno number(4) NOT NULL,Esal number(8,2));
+
+INSERT ALL
+  INTO myemp(Eno,Ename,Deptno,Esal) VALUES (10,'Anu',101,15000)
+  INTO myemp(Eno,Ename,Deptno,Esal) VALUES (20,'Arya',102,12000)
+  INTO myemp(Eno,Ename,Deptno,Esal) VALUES (30,'Malini',103,25000)
+  INTO myemp(Eno,Ename,Deptno,Esal) VALUES (40,'Sankari',104,30000)
+  INTO myemp(Eno,Ename,Deptno,Esal) VALUES (50,'varshini',105,14000)
+SELECT * FROM dual;
+
+Alter table myemp add experience number(4);
+
+insert into myemp(Eno,Ename,Deptno,Esal,experience) values(60,'lav',103,20000,3);
+insert into myemp(Eno,Ename,Deptno,Esal,experience) values(70,'lav12',104,22000,2);
+
+update myemp set Esal=null where Esal BETWEEN 12000 AND 15000;
+
+2)
+Alter table myemp add comm number(4);
+create table empcommmnull as (select eno,ename,comm from myemp where comm IS NULL);
+
+4)
+CREATE OR REPLACE TRIGGER weekend1_trigger 
+BEFORE INSERT OR UPDATE OR DELETE on myemp 
+  FOR EACH ROW
+  DECLARE
+  v_day DATE := TRUNC(SYSDATE);
+  ex_invalid  EXCEPTION; 
+  BEGIN
+    IF TO_CHAR(v_day,'DY')IN ('SAT','SUN') THEN
+       RAISE ex_invalid;
+    END IF;
+    EXCEPTION 
+    WHEN ex_invalid THEN 
+      RAISE_APPLICATION_ERROR(-20001,'Sorry Access on week-end days is denied');
+  END;
+
+
+5)
+DECLARE
+Sample_exception EXCEPTION;
+PROCEDURE nested_block
+IS
+BEGIN
+Dbms_output.put_line('Inside nested block');
+Dbms_output.put_line('Raising sample_exception from nested block');
+RAISE sample_exception;
+EXCEPTION
+WHEN sample_exception THEN 
+Dbms_output.put_line ('Exception captured in nested block Raising to main block');
+RAISE;
+END;
+BEGIN
+Dbms_output.put_line('Inside main block');
+Dbms_output.put_line('Calling nested block');
+Nested_block;
+EXCEPTION
+WHEN sample_exception THEN	
+Dbms_output.put_line ('Exception captured in main block');
+END;
+/
+
+6)
+Create table Ebill(Cno number(4) PRIMARY KEY, Cname varchar2(30) NOT NULL,Nounits number(4) NOT NULL,Bamt number(8,2));
+
+
+INSERT ALL
+  INTO Ebill(Cno,Cname,Nounits,Bamt) VALUES (10,'Anu',200,1500)
+  INTO Ebill(Cno,Cname,Nounits,Bamt) VALUES (20,'Arya',500,1200)
+  INTO Ebill(Cno,Cname,Nounits,Bamt) VALUES (30,'Malini',300,2500)
+  INTO Ebill(Cno,Cname,Nounits,Bamt) VALUES (40,'Sankari',100,3000)
+  INTO Ebill(Cno,Cname,Nounits,Bamt) VALUES (50,'varshini',90,1400)
+SELECT * FROM dual;
+
+CREATE OR REPLACE PROCEDURE ebill AS ebillamt ebill%rowtype;
+CURSOR c1 IS
+SELECT *
+FROM ebill;
+cno number,
+vname varchar2,
+nounits number
+BEGIN
+
+IF nounits>=10
+ bamt:=nounits*4+200;
+ELSE IF nounits>=30
+  bamt:=nounits*6+300; 
+
+update ebill set bamt=bamt where bamt=NULL;
+
+END LOOP;
+END;
