@@ -1,0 +1,90 @@
+Create table myemp (Eno number(4) PRIMARY KEY, Ename varchar2(30) NOT NULL,Deptno number(4) NOT NULL,Esal number(8,2));
+
+INSERT ALL
+  INTO myemp(Eno,Ename,Deptno,Esal) VALUES (10,'Anu',101,15000)
+  INTO myemp(Eno,Ename,Deptno,Esal) VALUES (20,'Arya',102,12000)
+  INTO myemp(Eno,Ename,Deptno,Esal) VALUES (30,'Malini',103,25000)
+  INTO myemp(Eno,Ename,Deptno,Esal) VALUES (40,'Sankari',104,30000)
+  INTO myemp(Eno,Ename,Deptno,Esal) VALUES (50,'varshini',105,14000)
+SELECT * FROM dual;
+
+Alter table myemp add experience number(4);
+
+Alter table myemp add comm number(4);
+insert into myemp(Eno,Ename,Deptno,Esal,experience) values(60,'lav',103,20000,3);
+insert into myemp(Eno,Ename,Deptno,Esal,experience) values(70,'lav12',104,22000,2);
+Alter table myemp add comm number(4) NOT NULL;
+
+update myemp set Esal=null where Esal BETWEEN 12000 AND 15000;
+
+2)create table empcommnull as select * from myemp where Esal=null ;
+
+CREATE OR REPLACE TRIGGER emptrigs
+BEFORE DELETE OR INSERT OR UPDATE ON myemp
+FOR EACH ROW 
+WHEN (NEW.Eno > 0) 
+DECLARE 
+   weekend varchar(30);
+ 
+BEGIN 
+  weekend:=&weekend;
+ IF(weekend=='sat' || weekend=='sun') THEN
+   dbms_output.put_line('Access Denied'); 
+  END IF;
+END; 
+/ 
+
+DECLARE
+    employee myemp%rowtype;
+    BEGIN
+       SELECT * INTO employee FROM myemp where Eno=100;
+      EXCEPTION
+       WHEN no_data_found THEN
+               dbms_output.put_line('employee data is unavailable');
+     END;
+      /
+
+
+DECLARE
+    myex EXCEPTION;
+    i NUMBER;
+BEGIN
+    FOR i IN (SELECT * FROM myemp) LOOP
+        IF i.Eno=40 THEN
+            RAISE myex;
+        END IF;
+    END LOOP;
+EXCEPTION
+    WHEN myex THEN
+        dbms_output.Put_line('Employee number already exist in employees table.');
+END;
+/
+
+Create table Ebill(Cno number(4) PRIMARY KEY, Cname varchar2(30) NOT NULL,Nounits number(4) NOT NULL,Bamt number(8,2));
+
+
+INSERT ALL
+  INTO Ebill(Cno,Cname,Nounits,Bamt) VALUES (10,'Anu',200,1500)
+  INTO Ebill(Cno,Cname,Nounits,Bamt) VALUES (20,'Arya',500,1200)
+  INTO Ebill(Cno,Cname,Nounits,Bamt) VALUES (30,'Malini',300,2500)
+  INTO Ebill(Cno,Cname,Nounits,Bamt) VALUES (40,'Sankari',100,3000)
+  INTO Ebill(Cno,Cname,Nounits,Bamt) VALUES (50,'varshini',90,1400)
+SELECT * FROM dual;
+
+
+
+ create or replace procedure PROCESS_EMP is
+    cursor c is select Cno, Cname,Nounits,Bamt from myemp;
+    amount:number;
+    begin
+      for i in c loop
+      if (nounits>200) THEN
+      amount=(nounits-200)*1.5+150;
+      else if (nounits>100) THEN 
+      amount=(unit-100)*1.5+50; 
+      else amount=unit*0.5 
+      end if;
+     end loop;
+   dbms_output.Put_line('amount:'|| amount);
+   end;
+  /
